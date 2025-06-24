@@ -14,7 +14,7 @@ CPP_OBJS = $(CPP_SRCS:.cpp=.o)
 HEADERS := modules.hpp
 
 # target name
-TARGET := systemcc
+TARGET := projekt
 
 # Path to your systemc installation
 SCPATH = $(SYSTEMC_HOME)
