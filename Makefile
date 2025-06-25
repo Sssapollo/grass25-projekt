@@ -3,15 +3,15 @@
 # ---------------------------------------
 
 # entry point for the program and target name
-C_SRCS = main.c
-CPP_SRCS = modules.cpp
+C_SRCS = #TODO
+CPP_SRCS = #TODO
 
 # Object files
 C_OBJS = $(C_SRCS:.c=.o)
 CPP_OBJS = $(CPP_SRCS:.cpp=.o)
 
 # assignment task file
-HEADERS := modules.hpp
+HEADERS :=#TODO
 
 # target name
 TARGET := projekt

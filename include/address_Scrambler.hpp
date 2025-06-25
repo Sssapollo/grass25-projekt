@@ -35,4 +35,4 @@ SC_MODULE(AddressScramblerSC) {
     }
 };
 
-#endif  // ADDRESS_SCRAMBLER_SC_H
+#endif 
