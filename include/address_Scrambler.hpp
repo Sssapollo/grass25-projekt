@@ -4,7 +4,7 @@
 #include <systemc.h>
 
 
-SC_MODULE(AddressScramblerSC) {
+SC_MODULE(AddressScrambler) {
 
     sc_in<sc_uint<32>> logical_addr;   
     sc_in<sc_uint<32>> scrambling_key;  
@@ -16,7 +16,7 @@ SC_MODULE(AddressScramblerSC) {
     sc_out<sc_uint<32>> phys_addr3;     
 
 
-    SC_CTOR(AddressScramblerSC) {
+    SC_CTOR(AddressScrambler) {
 
         SC_METHOD(scramble_proc);
         sensitive << clk.pos();
