@@ -21,7 +21,6 @@ SC_MODULE(TINY_RISC) {
 
     ADDRESS_SCRAMBLER address_scrambler;
     ENCRYPTOR encryptor;
-    FAULT_INJECTION fault_injection;
     MEMORY_ACCESS memory_access;
     PARITY_CHECKER parity_checker;
     PRNG prng;
