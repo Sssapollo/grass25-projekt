@@ -5,7 +5,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-
+extern int run_simulation(
+                          const char *request_list,
+                          uint32_t    cycles,
+                          const char *tracefile,
+                          uint8_t     endianness,
+                          uint32_t    lat_scramble,
+                          uint32_t    lat_encrypt,
+                          uint32_t    lat_mem,
+                          uint32_t    seed
+    );
 const char* usage_msg = 
     "Usage: %s [options] <file>\n   "
     "Options:\n"
@@ -164,7 +173,15 @@ int main(int argc, char** argv){
     fread(input, 1, file_size, file);
     fclose(file);
     input[file_size] = '\0';
-    //TODO
+
+    run_simulation(input,
+                   cycles,
+                   tracefile,
+                   endianness,
+                   latency_scrambling,
+                   latency_encrypt,
+                   latency_memory_access,
+                   seed);
 
     return 0;
 }

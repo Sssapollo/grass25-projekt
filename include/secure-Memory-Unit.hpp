@@ -7,6 +7,18 @@
 #include <map>
 using namespace sc_core;
 
+
+extern "C" struct Result run_simulation(const char *file_txt,
+    uint32_t max_cycles,
+    const char *tracefile,
+    uint8_t endianness,
+    uint32_t latency_scrambling,
+    uint32_t latency_encryption,
+    uint32_t latency_memory_access,
+    uint32_t seed,
+    uint32_t numRequests,
+    struct Request *requests);
+
 // #include "address_Scrambler.hpp"
 // #include "encryptor.hpp"
 // #include "fault-Injection.hpp"
@@ -103,7 +115,7 @@ void process() {
         
 
       if(fault.read() != UINT32_MAX){
-        uint32_t index = faultbit.read().touint();
+        uint32_t index = faultbit.read().to_uint();
           if( index == 8){
             parity_memory[fault.read()] = !parity_memory[fault.read()];
 
@@ -111,6 +123,9 @@ void process() {
               memory[fault.read()] = memory[fault.read()] ^ (1 << index);
           }
       }
+
+      uint32_t addresses[4] = {0, 0, 0, 0};
+      uint8_t encrypted_data_bytes[4] = {0, 0, 0, 0};
 
 
 
@@ -126,8 +141,8 @@ void process() {
           uint32_t p0, p1, p2, p3;
           scramble(address, scrambler_key, p0, p1, p2, p3); 
           for (uint32_t i = 0; i < latency_scrambling; ++i) wait();
-          uint32_t addresses[4] = {p0, p1, p2, p3};
-          uint8_t encypted_data_bytes[4];
+          addresses[0]=p0; addresses[1]=p1; addresses[2]=p2; addresses[3]=p3;
+          
 
         }
         if(w.read()){
@@ -138,13 +153,13 @@ void process() {
           uint8_t value = 0;
           int byteIndex = isBigEndian ? (3 - i) : i;
           value = (encrypted_data >> (i * 8)) & 0xFF;
-          encypted_data_bytes[byteIndex] = value;
+          encrypted_data_bytes[byteIndex] = value;
         }
           for (int i = 0; i < 4; i++)
           {
-            int parity = calculate_parity(encypted_data_bytes[i]);
+            int parity = calculate_parity(encrypted_data_bytes[i]);
             parity_memory[addresses[i]] = parity;
-            write_memory(addresses[i], encypted_data_bytes[i]);
+            write_memory(addresses[i], encrypted_data_bytes[i]);
         }
         for(uint32_t j = 0; j < latency_memory_access; ++j) wait();
          error.write(false);
@@ -156,18 +171,18 @@ void process() {
               int byteIndex = isBigEndian ? (3-i) : i;
               value = read_memory(addresses[i]) & 0xFF;
               
-              encypted_data_bytes[byteIndex] = value;
+              encrypted_data_bytes[byteIndex] = value;
             }
             for(uint32_t j = 0; j < latency_memory_access; ++j) wait();
             uint32_t data_r = 0;
             for (int i = 0; i < 4; i++)
           {
-            int parity = calculate_parity(encypted_data_bytes[i]);
-           
+            int parity = calculate_parity(encrypted_data_bytes[i]);
+
             if (parity_memory[addresses[i]] != parity) {
               error_flag = true;
             }
-            data_r |= (encypted_data_bytes[i] << (i * 8));
+            data_r |= (encrypted_data_bytes[i] << (i * 8));
           }
             data_r = encrypt(data_r, encryptor_key);// Decrypt the data
             for (uint32_t i = 0; i < latency_encryption; ++i) wait();

@@ -3,15 +3,15 @@
 # ---------------------------------------
 
 # entry point for the program and target name
-C_SRCS = #TODO
-CPP_SRCS = #TODO
+C_SRCS = src/main.c
+CPP_SRCS = src/simulation.cpp
 
 # Object files
 C_OBJS = $(C_SRCS:.c=.o)
 CPP_OBJS = $(CPP_SRCS:.cpp=.o)
 
 # assignment task file
-HEADERS :=#TODO
+HEADERS := include/secure-Memory-Unit.hpp
 
 # target name
 TARGET := projekt
@@ -21,6 +21,8 @@ SCPATH = $(SYSTEMC_HOME)
 
 # Additional flags for the compiler
 CXXFLAGS := -std=c++14  -I$(SCPATH)/include -L$(SCPATH)/lib -lsystemc -lm
+
+
 
 
 # ---------------------------------------
@@ -72,6 +74,6 @@ $(TARGET): $(C_OBJS) $(CPP_OBJS)
 # clean up
 clean:
 	rm -f $(TARGET)
-	rm -rf *.o
+	rm -rf src/*.o
 
 .PHONY: all debug release clean
