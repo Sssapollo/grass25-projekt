@@ -16,7 +16,6 @@ struct Result {
     uint32_t errors;
 };
 struct Result run_simulation(
-    const char *file_txt,
     uint32_t max_cycles,
     const char *tracefile,
     uint8_t endianness,

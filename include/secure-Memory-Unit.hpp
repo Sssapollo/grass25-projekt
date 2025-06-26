@@ -8,7 +8,7 @@
 using namespace sc_core;
 
 
-extern "C" struct Result run_simulation(const char *file_txt,
+extern "C" struct Result run_simulation(
     uint32_t max_cycles,
     const char *tracefile,
     uint8_t endianness,
@@ -259,4 +259,4 @@ uint32_t generate(uint32_t seed,uint32_t &state) {
 
 };
 
-#endif // TINYRISC_HPP
+#endif // SECURE_MEMORY_UNIT_HPP

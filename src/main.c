@@ -5,15 +5,30 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+struct Request {
+    uint32_t addr;
+    uint32_t data;      
+    uint8_t  r;         
+    uint8_t  w;        
+    uint32_t fault;    
+    uint8_t  faultBit; 
+};
+
+struct Result {
+    uint32_t cycles;
+    uint32_t errors;
+};
+
 extern int run_simulation(
-                          const char *request_list,
                           uint32_t    cycles,
                           const char *tracefile,
                           uint8_t     endianness,
                           uint32_t    lat_scramble,
                           uint32_t    lat_encrypt,
                           uint32_t    lat_mem,
-                          uint32_t    seed
+                          uint32_t    seed,
+                          uint32_t    numRequests,
+                          struct Request *requests
     );
 const char* usage_msg = 
     "Usage: %s [options] <file>\n   "
@@ -173,15 +188,20 @@ int main(int argc, char** argv){
     fread(input, 1, file_size, file);
     fclose(file);
     input[file_size] = '\0';
+    // TODO:Parse the input file to get the number of requests and their details
+    uint32_t numRequests = 0;
+    struct Request *requests = NULL;
 
-    run_simulation(input,
+    run_simulation(
                    cycles,
                    tracefile,
                    endianness,
                    latency_scrambling,
                    latency_encrypt,
                    latency_memory_access,
-                   seed);
+                   seed,
+                   numRequests,
+                   requests);
 
     return 0;
 }
