@@ -2,19 +2,7 @@
 
 #include "../include/secure-Memory-Unit.hpp"
 
-struct Request {
-    uint32_t addr;
-    uint32_t data;      
-    uint8_t  r;         
-    uint8_t  w;        
-    uint32_t fault;    
-    uint8_t  faultBit; 
-};
 
-struct Result {
-    uint32_t cycles;
-    uint32_t errors;
-};
 struct Result run_simulation(
     uint32_t max_cycles,
     const char *tracefile,
@@ -60,8 +48,8 @@ struct Result run_simulation(
     r.write(false);
     w.write(false);
     sc_start(1, SC_NS); 
-    int err_count = 0;
-    int cyc_count = 0;
+    uint32_t err_count = 0;
+    uint32_t cyc_count = 0;
     for (uint32_t i = 0; i < numRequests && cyc_count < max_cycles; ++i){
         if (requests[i].fault != UINT32_MAX) {
             fault.write(requests[i].fault);

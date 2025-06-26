@@ -7,6 +7,20 @@
 #include <map>
 using namespace sc_core;
 
+struct Request {
+    uint32_t addr;
+    uint32_t data;      
+    uint8_t  r;         
+    uint8_t  w;        
+    uint32_t fault;    
+    uint8_t  faultBit; 
+};
+
+struct Result {
+    uint32_t cycles;
+    uint32_t errors;
+};
+
 
 extern "C" struct Result run_simulation(
     uint32_t max_cycles,
