@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <stdint.h>
 #include <errno.h>
+#include <ctype.h>
 
 struct Request {
     uint32_t addr;
@@ -341,7 +342,11 @@ int main(int argc, char** argv){
     uint32_t numRequests = 0;
     struct Request *requests = NULL;
 
-    result = parse_requests(input, &numRequests, &requests);
+    if (parse_requests(input, &numRequests, &requests) != 0) {
+        fprintf(stderr, "Failed to parse requests from input file.\n");
+        free(input);
+        return 1;
+    }
 
     run_simulation(
                    cycles,
