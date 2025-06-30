@@ -33,23 +33,14 @@ extern "C" struct Result run_simulation(
     uint32_t numRequests,
     struct Request *requests);
 
-// #include "address_Scrambler.hpp"
-// #include "encryptor.hpp"
-// #include "fault-Injection.hpp"
-// #include "memory-Access.hpp"
-// #include "Parity-Checker.hpp"
-// #include "prng.hpp"
+
 
 SC_MODULE(SecureMemoryUnit) {
 
 
   SC_HAS_PROCESS(SecureMemoryUnit);
 
-    // AddressScrambler address_scrambler;
-    // Encryptor encryptor;
-    // MAIN_MEMORY memory_access;
-    // PARITY_CHECKER parity_checker;
-    // PRNG prng;
+
 
 
     sc_in<bool> clk;
@@ -109,12 +100,9 @@ SC_MODULE(SecureMemoryUnit) {
 
     
     {
-    memory.clear();
-    parity_memory.clear();
-    error_flag = false;
-    ready.write(false);
-    rdata.write(0);
-    error.write(false);
+
+    
+
     SC_THREAD(process);
     sensitive << clk.pos();
 
@@ -124,8 +112,11 @@ SC_MODULE(SecureMemoryUnit) {
 }
 
 
+
+
 void process() {
     while (true) {
+      wait(); 
         
 
       if(fault.read() != UINT32_MAX){
@@ -269,6 +260,18 @@ uint32_t generate(uint32_t seed,uint32_t &state) {
   // write memory
   void write_memory(uint32_t address, uint8_t value) {
       memory[address] = value & 0xFF;
+  }
+
+    void setScramblingKey(uint32_t key){
+    scrambler_key = key;
+  }
+
+  void setEncryptionKey(uint32_t key){
+    encryptor_key = key;
+  }
+
+  uint8_t getByteAt(uint32_t physicalAddress) {
+    return memory[physicalAddress];
   }
 
 };

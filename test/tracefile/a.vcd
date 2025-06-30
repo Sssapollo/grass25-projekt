@@ -1,0 +1,157 @@
+$date
+     Jun 30, 2025       13:28:56
+$end
+
+$version
+ SystemC 2.3.4-Accellera --- May 21 2025 12:04:13
+$end
+
+$timescale
+     1 ps
+$end
+
+$scope module SystemC $end
+$var wire    1  aaaaa  clk       $end
+$var wire   32  aaaab  addr [31:0]  $end
+$var wire   32  aaaac  wdata [31:0]  $end
+$var wire    1  aaaad  r       $end
+$var wire    1  aaaae  w       $end
+$var wire   32  aaaaf  fault [31:0]  $end
+$var wire    4  aaaag  faultbit [3:0]  $end
+$var wire    1  aaaah  ready       $end
+$var wire    1  aaaai  error       $end
+$var wire   32  aaaaj  rdata [31:0]  $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+1aaaaa
+b0 aaaab
+b0 aaaac
+0aaaad
+0aaaae
+b11111111111111111111111111111111 aaaaf
+b0 aaaag
+1aaaah
+0aaaai
+b0 aaaaj
+$end
+
+#500
+0aaaaa
+
+#1000
+1aaaaa
+b100000000 aaaab
+1aaaad
+
+#1500
+0aaaaa
+
+#2000
+1aaaaa
+
+#2500
+0aaaaa
+
+#3000
+1aaaaa
+b10101 aaaac
+0aaaad
+1aaaae
+
+#3500
+0aaaaa
+
+#4000
+1aaaaa
+
+#4500
+0aaaaa
+
+#5000
+1aaaaa
+b0 aaaac
+1aaaad
+0aaaae
+
+#5500
+0aaaaa
+
+#6000
+1aaaaa
+b10101 aaaaj
+
+#6500
+0aaaaa
+
+#7000
+1aaaaa
+b100010000 aaaab
+b1 aaaac
+0aaaad
+1aaaae
+
+#7500
+0aaaaa
+
+#8000
+1aaaaa
+b0 aaaaj
+
+#8500
+0aaaaa
+
+#9000
+1aaaaa
+b0 aaaab
+b0 aaaac
+b100000000 aaaaf
+b1 aaaag
+
+#9500
+0aaaaa
+
+#10000
+1aaaaa
+
+#10500
+0aaaaa
+
+#11000
+1aaaaa
+b100000000 aaaab
+1aaaad
+0aaaae
+b11111111111111111111111111111111 aaaaf
+b0 aaaag
+
+#11500
+0aaaaa
+
+#12000
+1aaaaa
+1aaaai
+
+#12500
+0aaaaa
+
+#13000
+1aaaaa
+b100010000 aaaab
+
+#13500
+0aaaaa
+
+#14000
+1aaaaa
+0aaaai
+b1 aaaaj
+
+#14500
+0aaaaa
+

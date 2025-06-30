@@ -13,7 +13,7 @@ struct Result run_simulation(
     uint32_t seed,
     uint32_t numRequests,
     struct Request *requests) {
-    sc_clock clk("clk", 1, SC_SEC);
+    sc_clock clk("clk", 1, SC_NS);
     sc_signal<uint32_t> addr, wdata, fault;
     sc_signal<bool>     r, w;
     sc_signal<sc_dt::sc_bv<4>> faultbit;
@@ -27,6 +27,11 @@ struct Result run_simulation(
         sc_trace(tf, addr, "addr");
         sc_trace(tf, wdata, "wdata");
         sc_trace(tf, r, "r");
+        sc_trace(tf, w, "w");
+        sc_trace(tf, fault, "fault");
+        sc_trace(tf, faultbit, "faultbit");
+        sc_trace(tf, ready, "ready");
+        sc_trace(tf, error, "error");
         sc_trace(tf, rdata, "rdata");
         }
 
@@ -51,6 +56,14 @@ struct Result run_simulation(
     uint32_t err_count = 0;
     uint32_t cyc_count = 0;
     for (uint32_t i = 0; i < numRequests && cyc_count < max_cycles; ++i){
+        cout << "Processing request " << i + 1 << " of " << numRequests << std::endl;
+        cout << "Request details: "<< requests[i].r<< " "<< requests[i].w << " " << std::hex << requests[i].addr << " " << requests[i].data << std::dec << std::endl;
+
+        while (!ready.read() && cyc_count < max_cycles) {
+            sc_start(1, SC_NS);
+            ++cyc_count;
+        }
+    
         if (requests[i].fault != UINT32_MAX) {
             fault.write(requests[i].fault);
             faultbit.write(requests[i].faultBit & 0xF);
@@ -58,26 +71,43 @@ struct Result run_simulation(
             fault.write(UINT32_MAX);
         } 
        if (requests[i].r) {
-            r.write(true);  w.write(false);
+            r.write(true);  
+            w.write(false);
+            addr.write(requests[i].addr);
         } else {                              
-            w.write(true);  r.write(false);
+            w.write(true);  
+            r.write(false);
             wdata.write(requests[i].data);
+            addr.write(requests[i].addr);
         }
+        sc_start(1, SC_NS); 
         while (!ready.read() && cyc_count < max_cycles){
             sc_start(1, SC_NS);
             cyc_count++;
         }
-        if(requests[i].r){
-            rdata.write(requests[i].data);
-        }
+        sc_start(1, SC_NS); 
+
         if (error.read()){
             err_count++;
+        }
+        //for debugging
+        if(w.read()){
+            cout << "Write to address: " <<  addr.read() 
+                 << " Data: " << wdata.read() << std::endl;
+        }
+        if(r.read()){
+            cout << "Read from address: " << addr.read() 
+                 << " Data: "<< rdata.read() << std::endl;
         }
 
         r.write(false); 
         w.write(false);
+        addr.write(0);
         fault.write(UINT32_MAX);
-        sc_start(1, SC_NS); ++cyc_count;
+        faultbit.write("0000");
+        wdata.write(0);
+        sc_start(SC_ZERO_TIME); 
+        ++cyc_count;
     }
 
 

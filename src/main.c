@@ -22,7 +22,7 @@ struct Result {
     uint32_t errors;
 };
 
-extern int run_simulation(
+extern struct Result run_simulation(
                           uint32_t    cycles,
                           const char *tracefile,
                           uint8_t     endianness,
@@ -221,7 +221,7 @@ char* split_next_line(const char* code, char* type, char* address, char* data, c
 int parse_requests(const char *input, uint32_t *numRequests, struct Request **requests) {
     // TODO: Implement request parsing logic
     uint32_t count = 0;
-    uint32_t capacity = 256;
+    uint32_t capacity = 256; // our default capacity for requests
     struct Request *arr = malloc(capacity * sizeof(struct Request));
      if (!arr) {
         perror("malloc");
@@ -231,8 +231,16 @@ int parse_requests(const char *input, uint32_t *numRequests, struct Request **re
 
     char type_buf[32], addr_buf[64], data_buf[64], fault_buf[64], faultbit_buf[16];
 
-    const char *cursor = input;
-    while ((cursor = split_next_line(cursor,
+    const char *new_line = input;
+    while (*new_line!= '\n') {
+        if(*new_line == '\0') {
+            break; 
+        }
+        new_line++;   
+    }// Skip the first line as it is Header
+
+    
+    while ((new_line = split_next_line(new_line,
                                      type_buf, addr_buf, data_buf,
                                      fault_buf, faultbit_buf))) {
 
@@ -241,7 +249,7 @@ int parse_requests(const char *input, uint32_t *numRequests, struct Request **re
 
         
         struct Request req = {0};
-        req.fault = 0;
+        req.fault = UINT32_MAX;
         req.faultBit = 0;
         req.r = 0;
         req.w = 0;
@@ -254,20 +262,56 @@ int parse_requests(const char *input, uint32_t *numRequests, struct Request **re
         if (t == 'r') {
             req.r = 1;
             req.addr = parse_uint32(addr_buf);
+            if (req.addr == (uint32_t)-1) {
+                fprintf(stderr, "Invalid address in read request: %s\n", addr_buf);
+                free(arr);
+                return -1;
+            }
+            
 
         } else if (t == 'w') {
             req.w = 1;
             req.addr = parse_uint32(addr_buf);
+            if (req.addr == (uint32_t)-1) {
+                fprintf(stderr, "Invalid address in write request: %s\n", addr_buf);
+                free(arr);
+                return -1;
+            }
             req.data = parse_uint32(data_buf);
+            if (req.data == (uint32_t)-1) {
+                fprintf(stderr, "Invalid data in write request: %s\n", data_buf);
+                free(arr);
+                return -1;
+            }
         } else if (t == 'f') {
             req.fault    = parse_uint32(fault_buf);
+            if (req.fault == (uint32_t)-1) {
+                fprintf(stderr, "Invalid fault in fault request: %s\n", fault_buf);
+                free(arr);
+                return -1;
+            }
             req.faultBit = parse_uint8(faultbit_buf);
+            if (req.faultBit == (uint8_t)-1) {
+                fprintf(stderr, "Invalid fault bit in fault request: %s\n", faultbit_buf);
+                free(arr);
+                return -1;
+            }
            
         }
 
         if (t != 'f' && (fault_buf[0] || faultbit_buf[0])) {
             req.fault    = parse_uint32(fault_buf);
+            if (req.fault == (uint32_t)-1) {
+                fprintf(stderr, "Invalid fault in request: %s\n", fault_buf);
+                free(arr);
+                return -1;
+            }
             req.faultBit = parse_uint8(faultbit_buf);
+            if (req.faultBit == (uint8_t)-1|| (req.faultBit > 8)) {
+                fprintf(stderr, "Invalid fault bit in request: %s\n", faultbit_buf);
+                free(arr);
+                return -1;
+            }
         }
 
 
@@ -278,6 +322,7 @@ int parse_requests(const char *input, uint32_t *numRequests, struct Request **re
 
     *numRequests = count;
     *requests    = arr;
+    
     return 0;
 }
 
@@ -303,7 +348,7 @@ FILE* validate_and_open_read(const char *path) {
 
 int main(int argc, char** argv){
 
-    static uint32_t cycles = 1;
+    static uint32_t cycles = 1000;
     static char *tracefile = NULL;
     static char *input_file = NULL;
     static uint8_t endianness = 0; // Default: Little-Endian
@@ -348,7 +393,7 @@ int main(int argc, char** argv){
         return 1;
     }
 
-    run_simulation(
+    struct Result res = run_simulation(
                    cycles,
                    tracefile,
                    endianness,
@@ -361,9 +406,12 @@ int main(int argc, char** argv){
 
 
 
-
+    printf("Simulation completed:\n");
+    printf("Cycles: %u\n", res.cycles);
+    printf("Errors: %u\n", res.errors);
 
 
     free(input);
+    free(requests);
     return 0;
 }
