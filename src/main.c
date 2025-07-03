@@ -177,7 +177,7 @@ int extract_arg(const char* line,int counter, char* arg_buf) {
 
 
 
-char* split_next_line(const char* code, char* type, char* address, char* data, char* fault, char* faultbit) {
+const char* split_next_line(const char* code, char* type, char* address, char* data, char* fault, char* faultbit) {
     type[0] = address[0] = data[0] = fault[0] = faultbit[0] = '\0';
     if (!code || *code == '\0') return NULL;
     while (*code == '\n'||*code == '\t'||*code == ' ') code++;
@@ -232,6 +232,11 @@ int parse_requests(const char *input, uint32_t *numRequests, struct Request **re
     char type_buf[32], addr_buf[64], data_buf[64], fault_buf[64], faultbit_buf[16];
 
     const char *new_line = input;
+
+    while(*new_line == '\n' || *new_line == ' '|| *new_line == '\t') {
+        new_line++; 
+    }// Skip leading whitespace characters
+    
     while (*new_line!= '\n') {
         if(*new_line == '\0') {
             break; 
@@ -284,6 +289,11 @@ int parse_requests(const char *input, uint32_t *numRequests, struct Request **re
                 return -1;
             }
         } else if (t == 'f') {
+             if(addr_buf[0] != '\0' || data_buf[0] != '\0') {
+                fprintf(stderr, "Fault request should not have address or data: %s %s\n", addr_buf, data_buf);
+                free(arr);
+                return -1;
+            }
             req.fault    = parse_uint32(fault_buf);
             if (req.fault == (uint32_t)-1) {
                 fprintf(stderr, "Invalid fault in fault request: %s\n", fault_buf);
@@ -355,7 +365,7 @@ int main(int argc, char** argv){
     static uint32_t latency_scrambling = 0; // Default: 0
     static uint32_t latency_encrypt = 0; // Default: 0
     static uint32_t latency_memory_access = 0; // Default: 0
-    static uint32_t seed = 0; // Default: 0
+    static uint32_t seed = 1; // Default: 1
 
     int result = parse_cli(argc, argv, &cycles , &tracefile, &input_file,
                            &endianness, &latency_scrambling, &latency_encrypt,

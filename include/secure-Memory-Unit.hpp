@@ -88,7 +88,7 @@ SC_MODULE(SecureMemoryUnit) {
     rdata("rdata"),
     ready("ready"),
     error("error"),
-    state(0),
+    state(seed),
     scrambler_key(generate(seed,state)), 
     encryptor_key(generate(seed,state)),
     isBigEndian(endianness),
@@ -120,13 +120,29 @@ void process() {
         
 
       if(fault.read() != UINT32_MAX){
+        uint32_t fault_addresses[4] = {0, 0, 0, 0};
         uint32_t index = faultbit.read().to_uint();
-          if( index == 8){
-            parity_memory[fault.read()] = !parity_memory[fault.read()];
+        uint32_t fault_address = fault.read();
+        uint32_t f0, f1, f2, f3;
+        scramble(fault_address, scrambler_key, f0, f1, f2, f3);
+        for (uint32_t i = 0; i < latency_scrambling; ++i) wait();
+        fault_addresses[0] = f0;
+        fault_addresses[1] = f1;  
+        fault_addresses[2] = f2;
+        fault_addresses[3] = f3;
+         
+            for (uint32_t i = 0; i < 4; i++)
+            {
+               if( index == 8){
+              parity_memory[fault_addresses[i]] = !parity_memory[fault_addresses[i]];
+               }
+               else{
+                memory[fault_addresses[i]] = memory[fault_addresses[i]] ^ (1 << index);
+               }
+            }
+            
 
-          }else{
-              memory[fault.read()] = memory[fault.read()] ^ (1 << index);
-          }
+          
       }
 
       uint32_t addresses[4] = {0, 0, 0, 0};
@@ -156,9 +172,16 @@ void process() {
           for (uint32_t i = 0; i < latency_encryption; ++i) wait();
           for (int i = 0; i < 4; i++) {
           uint8_t value = 0;
+          uint8_t data_w_value = 0;
           int byteIndex = isBigEndian ? (3 - i) : i;
           value = (encrypted_data >> (i * 8)) & 0xFF;
+          //for debug Endianess
+          data_w_value = (data_w >> (i * 8)) & 0xFF;
+          printf("Writing byte %d: %02X\n", byteIndex, data_w_value);
+          //debug Endianess end
           encrypted_data_bytes[byteIndex] = value;
+          
+          
         }
           for (int i = 0; i < 4; i++)
           {
@@ -184,12 +207,18 @@ void process() {
           {
             int parity = calculate_parity(encrypted_data_bytes[i]);
 
-            if (parity_memory[addresses[i]] != parity) {
-              error_flag = true;
-            }
+           if (parity_memory.find(addresses[i]) != parity_memory.end()) {
+              // Check if the address exists in the parity memory
+              // If it exists, compare the stored parity with the calculated parity
+              if (parity_memory[addresses[i]] != parity) {
+                  error_flag = true;
+              }
+          }
             data_r |= (encrypted_data_bytes[i] << (i * 8));
           }
-            data_r = encrypt(data_r, encryptor_key);// Decrypt the data
+            if(data_r != 0){
+              data_r = encrypt(data_r, encryptor_key);// Decrypt the data
+            }//skip the decryption if data_r unmodified
             for (uint32_t i = 0; i < latency_encryption; ++i) wait();
             if(error_flag){
               error.write(true);
@@ -240,11 +269,9 @@ void scramble(uint32_t address, uint32_t key, uint32_t &p0, uint32_t &p1, uint32
 
 //PRNG generator
 uint32_t generate(uint32_t seed,uint32_t &state) {   
-        if (seed != 0 && state == 0) {
-            state = seed;
-        } else {
-            state = (state * 950706376) % 2147483647; 
-        }
+    
+        state = (state * 950706376) % 2147483647; 
+        
         return state;
        
     }

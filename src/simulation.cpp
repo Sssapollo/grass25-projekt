@@ -55,6 +55,10 @@ struct Result run_simulation(
     sc_start(1, SC_NS); 
     uint32_t err_count = 0;
     uint32_t cyc_count = 0;
+    //for debugging
+    // std::cout << "seed: " << smu.seed << std::endl;
+    // std::cout << "encrypt key: " << smu.encryptor_key << std::endl;
+    // std::cout << "scramble key: " << smu.scrambler_key << std::endl;
     for (uint32_t i = 0; i < numRequests && cyc_count < max_cycles; ++i){
         cout << "Processing request " << i + 1 << " of " << numRequests << std::endl;
         cout << "Request details: "<< requests[i].r<< " "<< requests[i].w << " " << std::hex << requests[i].addr << " " << requests[i].data << std::dec << std::endl;
@@ -81,11 +85,12 @@ struct Result run_simulation(
             addr.write(requests[i].addr);
         }
         sc_start(1, SC_NS); 
+        cyc_count++;
         while (!ready.read() && cyc_count < max_cycles){
             sc_start(1, SC_NS);
             cyc_count++;
         }
-        sc_start(1, SC_NS); 
+        
 
         if (error.read()){
             err_count++;
@@ -106,8 +111,8 @@ struct Result run_simulation(
         fault.write(UINT32_MAX);
         faultbit.write("0000");
         wdata.write(0);
-        sc_start(SC_ZERO_TIME); 
-        ++cyc_count;
+        // sc_start(1, SC_NS);
+        // cyc_count++;
     }
 
 
