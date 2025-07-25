@@ -8,7 +8,7 @@
 !/*.md
 !/build.sh
 !/Makefile
-!/*.pdf
+
 
 # 保留 include 和 src 目录及其所有内容
 !/include/
