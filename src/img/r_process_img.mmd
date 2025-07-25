@@ -1,0 +1,97 @@
+---
+config:
+  layout: elk
+  theme: neutral
+  look: classic
+---
+flowchart TB
+ subgraph Inputs["Inputs"]
+        r["r (read enable)"]
+        n2["logical_address"]
+        B["seed"]
+  end
+ subgraph Outputs["Outputs"]
+        rd["r_data"]
+        e["error"]
+  end
+ subgraph SMU["Secure-Memory Unit"]
+        n3["Address_Scrambler"]
+        n10["(De)Encryptor (XOR)"]
+        n16["Endianness Handler"]
+  end
+ subgraph PRNG["Pseudo Random Number Generator"]
+        A["Generator"]
+        C["State"]
+  end
+ subgraph Parity_checker["Parity-checker"]
+        O["parity_check"]
+        P["parity_memory"]
+  end
+ subgraph Physical_Address_Map["Physical_Address_Map"]
+        n4["p1: physical_address1"]
+        n5["p2: physical_address2"]
+        n6["p3: physical_address3"]
+        n7["p4: physical_address4"]
+  end
+ subgraph Memory["Memory"]
+        n8["Main Memory"]
+  end
+ subgraph Encrypted_SubBytes["Encrypted_SubBytes"]
+        n12["Byte1"]
+        n13["Byte2"]
+        n14["Byte3"]
+        n15["Byte4"]
+  end
+    n2 --> n3
+    n3 --> n4 & n5 & n6 & n7
+    n4 --> n8
+    n5 --> n8
+    n6 --> n8
+    n7 --> n8
+    n8 --> n12 & n13 & n14 & n15
+    n12 --> n16 & O
+    n13 --> n16 & O
+    n14 --> n16 & O
+    n15 --> n16 & O
+    P --> O
+    O --> e
+    n16 --> n11["decrypted 32-bit data"]
+    B --> A
+    n11 --> n10
+    n10 --> rd
+    A --> C
+    C --> A & n3 & n10
+    e --> rd
+    n3@{ shape: diam}
+    n10@{ shape: diam}
+    n16@{ shape: diam}
+    A@{ shape: diam}
+    O@{ shape: diam}
+    n8@{ shape: cyl}
+    style rd fill:#C8E6C9
+    style e fill:#FFCDD2
+    style n3 fill:#00C853
+    style n10 fill:#2962FF
+    style n16 fill:#AA00FF
+    style Outputs fill:#AA00FF
+    style Parity_checker fill:#D50000
+    style PRNG fill:#FF6D00
+    linkStyle 1 stroke:#00C853,fill:none
+    linkStyle 2 stroke:#00C853,fill:none
+    linkStyle 3 stroke:#00C853,fill:none
+    linkStyle 4 stroke:#00C853,fill:none
+    linkStyle 5 stroke:#00C853,fill:none
+    linkStyle 6 stroke:#00C853,fill:none
+    linkStyle 7 stroke:#00C853,fill:none
+    linkStyle 8 stroke:#00C853,fill:none
+    linkStyle 9 stroke:#00C853,fill:none
+    linkStyle 10 stroke:#00C853,fill:none
+    linkStyle 11 stroke:#00C853,fill:none
+    linkStyle 12 stroke:#00C853,fill:none
+    linkStyle 22 stroke:#D50000,fill:none
+    linkStyle 23 stroke:#AA00FF,fill:none
+    linkStyle 25 stroke:#AA00FF,fill:none
+    linkStyle 26 stroke:#2962FF,fill:none
+    linkStyle 29 stroke:#FF6D00,fill:none
+    linkStyle 30 stroke:#FF6D00,fill:none
+    linkStyle 31 stroke:#D50000,fill:none

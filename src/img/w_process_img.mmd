@@ -1,0 +1,102 @@
+---
+config:
+  layout: elk
+  theme: neutral
+  look: classic
+---
+flowchart TB
+ subgraph Inputs["Inputs"]
+        w["w (write enable)"]
+        n9["w_data (32-bit)"]
+        n2["logical_address"]
+        B["seed"]
+  end
+ subgraph SMU["Secure-Memory Unit"]
+        n3["Address_Scrambler"]
+        n10["Encryptor (XOR)"]
+        n16["Endianness Handler"]
+  end
+ subgraph PRNG["Pseudo Random Number Generator"]
+        A["Generator"]
+        C["State"]
+  end
+ subgraph Parity_checker["Parity-checker"]
+        O["parity_check"]
+        P["parity_memory"]
+  end
+ subgraph Physical_Address_Map["Physical_Address_Map"]
+        n4["p1: physical_address1"]
+        n5["p2: physical_address2"]
+        n6["p3: physical_address3"]
+        n7["p4: physical_address4"]
+  end
+ subgraph Memory["Memory"]
+        n8["Main Memory"]
+  end
+ subgraph Encrypted_SubBytes["Encrypted_SubBytes"]
+        n11["Encrypted 32-bit data"]
+        n12["Byte1"]
+        n13["Byte2"]
+        n14["Byte3"]
+        n15["Byte4"]
+  end
+    n2 --> n3
+    n9 --> n10
+    n3 --> n4 & n5 & n6 & n7
+    n4 --> n8
+    n4 ==> O
+    n5 --> n8
+    n5 ==> O
+    n6 --> n8
+    n6 ==> O
+    n7 --> n8
+    n7 ==> O
+    n10 --> n11
+    n11 --> n12 & n13 & n14 & n15
+    n12 --> n16
+    n13 --> n16
+    n14 --> n16
+    n15 --> n16
+    n16 --> n4 & n5 & n6 & n7
+    B --> A
+    A --> C
+    C --> A & n3 & n10
+    O --> P
+    n3@{ shape: diam}
+    n10@{ shape: diam}
+    n16@{ shape: diam}
+    A@{ shape: diam}
+    O@{ shape: diam}
+    n8@{ shape: cyl}
+    style n3 fill:#2962FF
+    style n10 fill:#00C853
+    style n16 fill:#AA00FF
+    style PRNG fill:#FF6D00
+    style Encrypted_SubBytes fill:#C8E6C9
+    style Physical_Address_Map fill:#BBDEFB
+    style Parity_checker fill:#C8E6C9
+    linkStyle 0 stroke:#D50000,fill:none
+    linkStyle 1 stroke:#D50000,fill:none
+    linkStyle 2 stroke:#2962FF,fill:none
+    linkStyle 3 stroke:#2962FF,fill:none
+    linkStyle 4 stroke:#2962FF,fill:none
+    linkStyle 5 stroke:#2962FF,fill:none
+    linkStyle 6 stroke:#2962FF,fill:none
+    linkStyle 7 stroke:#2962FF,fill:none
+    linkStyle 8 stroke:#2962FF,fill:none
+    linkStyle 9 stroke:#2962FF,fill:none
+    linkStyle 10 stroke:#2962FF,fill:none
+    linkStyle 11 stroke:#2962FF,fill:none
+    linkStyle 12 stroke:#2962FF,fill:none
+    linkStyle 13 stroke:#2962FF,fill:none
+    linkStyle 14 stroke:#00C853,fill:none
+    linkStyle 19 stroke:#00C853,fill:none
+    linkStyle 20 stroke:#00C853,fill:none
+    linkStyle 21 stroke:#00C853,fill:none
+    linkStyle 22 stroke:#00C853,fill:none
+    linkStyle 23 stroke:#AA00FF,fill:none
+    linkStyle 24 stroke:#AA00FF,fill:none
+    linkStyle 25 stroke:#AA00FF,fill:none
+    linkStyle 26 stroke:#AA00FF,fill:none
+    linkStyle 30 stroke:#FF6D00,fill:none
+    linkStyle 31 stroke:#FF6D00,fill:none
