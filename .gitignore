@@ -1,24 +1,20 @@
-# all files in the repository
+# 忽略所有文件
 *
 
-# keep gitignore file
+# 明确保留以下目录及其内容
 !/.gitignore
 
-# keep project root scripts and documentation
+# 保留项目文档和脚本
 !/*.md
 !/build.sh
 !/Makefile
 !/*.pdf
 
-# keep include directory and all its contents
-!*.cpp
-!*.hpp
-!*.c
-!/include/*.{hpp,c,cpp,h}
-!/src/*.{hpp,c,cpp,h}
+# 保留 include 和 src 目录及其所有内容
+!/include/
+!/include/**
+!/src/
+!/src/**
 
-#ignore /test directory and its contents
+# 忽略 test 目录及其内容
 /test/*
-
-
-
