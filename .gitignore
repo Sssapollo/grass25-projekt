@@ -1,0 +1,24 @@
+# all files in the repository
+*
+
+# keep gitignore file
+!/.gitignore
+
+# keep project root scripts and documentation
+!/*.md
+!/build.sh
+!/Makefile
+!/*.pdf
+
+# keep include directory and all its contents
+!*.cpp
+!*.hpp
+!*.c
+!/include/*.{hpp,c,cpp,h}
+!/src/*.{hpp,c,cpp,h}
+
+#ignore /test directory and its contents
+/test/*
+
+
+
